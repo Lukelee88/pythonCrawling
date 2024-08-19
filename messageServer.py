@@ -204,6 +204,8 @@ while True:
                             message_parts = message.split(' ', 2)
                             if len(message_parts) >= 3:
                                 sender = message_parts[2].strip('[]')
+                                remaining_message = ' '.join(message_parts[:2])
+                                regDate =remaining_message
                                 message = ""  # message는 빈 문자열로 남김
                             else:
                                 sender = ''
