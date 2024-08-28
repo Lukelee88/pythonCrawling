@@ -8,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import os
 import re
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from selenium.webdriver.common.by import By
 
 disaster_map = {
@@ -48,9 +48,9 @@ safety_map = {
 
 # Oracle DB 연결 정보
 db_user = 'c##numberone'
-db_password = 'pcwk'
-db_host = '118.33.104.105'
-db_port = '7777'
+db_password = ''
+db_host = ''
+db_port = ''
 db_service_name = 'xe'
 
 # Oracle DB 연결
@@ -172,7 +172,8 @@ while True:
 
             wait = WebDriverWait(driver, 10)
             today_date = datetime.now().strftime('%Y-%m-%d')
-            driver.execute_script("disasterSms_searchinfo.set('searchBgnDe', arguments[0])", today_date)
+            yesterday_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+            driver.execute_script("disasterSms_searchinfo.set('searchBgnDe', arguments[0])", yesterday_date)
             driver.execute_script("disasterSms_searchinfo.set('searchEndDe', arguments[0])", today_date)
             driver.execute_script("getDisasterSmsList_submission.exec()")
             time.sleep(0.3)
@@ -185,13 +186,14 @@ while True:
             new_messages = []
 
             while current_page <= totalpages:
+                wait.until(EC.visibility_of_element_located(("id", "iptpageinput")))
                 page_input = driver.find_element("id", "iptpageinput")
                 page_input.clear()
                 page_input.send_keys(str(current_page))
                 driver.find_element("id", "apagego").click()
                 time.sleep(0.3)
                 
-                wait.until(EC.visibility_of_element_located(("id", "iptpageinput")))
+                
                 rows = driver.find_elements("id", "disasterSms_tr")
 
                 for row in rows:
